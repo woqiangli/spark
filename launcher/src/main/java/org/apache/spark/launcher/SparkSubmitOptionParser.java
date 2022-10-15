@@ -86,7 +86,7 @@ class SparkSubmitOptionParser {
    * <p>
    * These two arrays are visible for tests.
    */
-  final String[][] opts = {
+  final String[][] opts = {// TODO:wo_note:
     { ARCHIVES },
     { CLASS },
     { CONF, "-c" },
@@ -150,7 +150,7 @@ class SparkSubmitOptionParser {
       }
 
       // Look for options with a value.
-      String name = findCliOption(arg, opts);
+      String name = findCliOption(arg, opts);// TODO:wo_note:
       if (name != null) {
         if (value == null) {
           if (idx == args.size() - 1) {

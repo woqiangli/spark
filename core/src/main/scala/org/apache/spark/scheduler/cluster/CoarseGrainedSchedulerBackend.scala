@@ -195,14 +195,14 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
         executorDataMap.get(executorId).foreach(_.executorEndpoint.send(StopExecutor))
         removeExecutor(executorId, reason)
 
-      case LaunchedExecutor(executorId) =>
+      case LaunchedExecutor(executorId) =>// TODO:wo_note:增加executor
         executorDataMap.get(executorId).foreach { data =>
           data.freeCores = data.totalCores
         }
         makeOffers(executorId)
     }
 
-    override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = {
+    override def receiveAndReply(context: RpcCallContext): PartialFunction[Any, Unit] = { // TODO:wo_note:注册executor处理方法
 
       case RegisterExecutor(executorId, executorRef, hostname, cores, logUrls,
           attributes, resources, resourceProfileId) =>
@@ -226,7 +226,7 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
           logInfo(s"Registered executor $executorRef ($executorAddress) with ID $executorId")
           addressToExecutorId(executorAddress) = executorId
           totalCoreCount.addAndGet(cores)
-          totalRegisteredExecutors.addAndGet(1)
+          totalRegisteredExecutors.addAndGet(1)// TODO:wo_note:增加注册的executor的资源
           val resourcesInfo = resources.map{ case (k, v) =>
             (v.name,
              new ExecutorResourceInfo(v.name, v.addresses,

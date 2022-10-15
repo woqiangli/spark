@@ -69,7 +69,7 @@ private[spark] class Client(
   import Client._
   import YarnSparkHadoopUtil._
 
-  private val yarnClient = YarnClient.createYarnClient
+  private val yarnClient = YarnClient.createYarnClient// TODO:wo_note:clien对象中有属性:rmClient(resourceManager)
   private val hadoopConf = new YarnConfiguration(SparkHadoopUtil.newConfiguration(sparkConf))
 
   private val isClusterMode = sparkConf.get(SUBMIT_DEPLOY_MODE) == "cluster"
@@ -169,7 +169,7 @@ private[spark] class Client(
     try {
       launcherBackend.connect()
       yarnClient.init(hadoopConf)
-      yarnClient.start()
+      yarnClient.start() // TODO:wo_note:连接resourceManager
 
       logInfo("Requesting a new application from cluster with %d NodeManagers"
         .format(yarnClient.getYarnClusterMetrics.getNumNodeManagers))
@@ -193,12 +193,12 @@ private[spark] class Client(
       verifyClusterResources(newAppResponse)
 
       // Set up the appropriate contexts to launch our AM
-      val containerContext = createContainerLaunchContext(newAppResponse)
+      val containerContext = createContainerLaunchContext(newAppResponse)// TODO:wo_note:设置container
       val appContext = createApplicationSubmissionContext(newApp, containerContext)
 
       // Finally, submit and monitor the application
       logInfo(s"Submitting application $appId to ResourceManager")
-      yarnClient.submitApplication(appContext)
+      yarnClient.submitApplication(appContext)// TODO:wo_note:提交application到yarn，运行main call 如：org.apache.spark.deploy.yarn.ApplicationMaster;图.步1. submitApplication
       launcherBackend.setAppId(appId.toString)
       reportLauncherState(SparkAppHandle.State.SUBMITTED)
 
@@ -976,7 +976,7 @@ private[spark] class Client(
         Nil
       }
     val amClass =
-      if (isClusterMode) {
+      if (isClusterMode) {// TODO:wo_note:根据不同的提交方式选择amclass，container运行是的main calss
         Utils.classForName("org.apache.spark.deploy.yarn.ApplicationMaster").getName
       } else {
         Utils.classForName("org.apache.spark.deploy.yarn.ExecutorLauncher").getName
@@ -993,7 +993,7 @@ private[spark] class Client(
       Seq("--properties-file",
         buildPath(Environment.PWD.$$(), LOCALIZED_CONF_DIR, SPARK_CONF_FILE)) ++
       Seq("--dist-cache-conf",
-        buildPath(Environment.PWD.$$(), LOCALIZED_CONF_DIR, DIST_CACHE_CONF_FILE))
+        buildPath(Environment.PWD.$$(), LOCALIZED_CONF_DIR, DIST_CACHE_CONF_FILE))// TODO:wo_note
 
     // Command for the ApplicationMaster
     val commands = prefixEnv ++
@@ -1001,7 +1001,7 @@ private[spark] class Client(
       javaOpts ++ amArgs ++
       Seq(
         "1>", ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stdout",
-        "2>", ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr")
+        "2>", ApplicationConstants.LOG_DIR_EXPANSION_VAR + "/stderr")// TODO:wo_note:container运行的命令
 
     // TODO: it would be nicer to just make sure there are no null commands here
     val printableCommands = commands.map(s => if (s == null) "null" else s).toList
@@ -1174,7 +1174,7 @@ private[spark] class Client(
    * throw an appropriate SparkException.
    */
   def run(): Unit = {
-    this.appId = submitApplication()
+    this.appId = submitApplication()// TODO:wo_note:提交application container到yarn运行
     if (!launcherBackend.isConnected() && fireAndForget) {
       val report = getApplicationReport(appId)
       val state = report.getYarnApplicationState
@@ -1574,13 +1574,13 @@ private object Client extends Logging {
 
 private[spark] class YarnClusterApplication extends SparkApplication {
 
-  override def start(args: Array[String], conf: SparkConf): Unit = {
+  override def start(args: Array[String], conf: SparkConf): Unit = {// TODO:wo_note:yarn模式下的submit class
     // SparkSubmit would use yarn cache to distribute files & jars in yarn mode,
     // so remove them from sparkConf here for yarn mode.
     conf.remove(JARS)
     conf.remove(FILES)
 
-    new Client(new ClientArguments(args), conf, null).run()
+    new Client(new ClientArguments(args), conf, null).run()// TODO:wo_note:封装参数
   }
 
 }

@@ -64,8 +64,8 @@ private[yarn] class ExecutorRunnable(
     logDebug("Starting Executor Container")
     nmClient = NMClient.createNMClient()
     nmClient.init(conf)
-    nmClient.start()
-    startContainer()
+    nmClient.start()// TODO:wo_note连接nodeManagerClient
+    startContainer()// TODO:wo_note启动executor的container
   }
 
   def launchContextDebugInfo(): String = {
@@ -98,7 +98,7 @@ private[yarn] class ExecutorRunnable(
     credentials.writeTokenStorageToStream(dob)
     ctx.setTokens(ByteBuffer.wrap(dob.getData()))
 
-    val commands = prepareCommand()
+    val commands = prepareCommand()// TODO:wo_note：executor container的运行命令
 
     ctx.setCommands(commands.asJava)
     ctx.setApplicationACLs(
@@ -122,7 +122,7 @@ private[yarn] class ExecutorRunnable(
 
     // Send the start request to the ContainerManager
     try {
-      nmClient.startContainer(container.get, ctx)
+      nmClient.startContainer(container.get, ctx)// TODO:wo_note:通过nodeManagerClient启动container
     } catch {
       case ex: Exception =>
         throw new SparkException(s"Exception while starting container ${container.get.getId}" +
@@ -214,7 +214,7 @@ private[yarn] class ExecutorRunnable(
       userClassPath ++
       Seq(
         s"1>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stdout",
-        s"2>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stderr")
+        s"2>${ApplicationConstants.LOG_DIR_EXPANSION_VAR}/stderr")// TODO:wo_note：executor container的运行命令，mainCalss: org.apache.spark.executor.YarnCoarseGrainedExecutorBackend
 
     // TODO: it would be nicer to just make sure there are no null commands here
     commands.map(s => if (s == null) "null" else s).toList

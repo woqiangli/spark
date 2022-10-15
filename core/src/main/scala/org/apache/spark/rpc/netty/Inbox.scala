@@ -60,7 +60,7 @@ private[netty] class Inbox(val endpointName: String, val endpoint: RpcEndpoint)
   inbox =>  // Give this an alias so we can use it more clearly in closures.
 
   @GuardedBy("this")
-  protected val messages = new java.util.LinkedList[InboxMessage]()
+  protected val messages = new java.util.LinkedList[InboxMessage]()// TODO:wo_note:
 
   /** True if the inbox (and its associated endpoint) is stopped. */
   @GuardedBy("this")
@@ -76,7 +76,7 @@ private[netty] class Inbox(val endpointName: String, val endpoint: RpcEndpoint)
 
   // OnStart should be the first message to process
   inbox.synchronized {
-    messages.add(OnStart)
+    messages.add(OnStart)// TODO:wo_note:触发executor endpoint osStart，实现: org.apache.spark.executor.CoarseGrainedExecutorBackend.onStart
   }
 
   /**

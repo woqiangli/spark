@@ -70,7 +70,7 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv, numUsableCores: Int) exte
 
       var messageLoop: MessageLoop = null
       try {
-        messageLoop = endpoint match {
+        messageLoop = endpoint match { // TODO:wo_note:创建messageLoop
           case e: IsolatedRpcEndpoint =>
             new DedicatedMessageLoop(name, e, this)
           case _ =>

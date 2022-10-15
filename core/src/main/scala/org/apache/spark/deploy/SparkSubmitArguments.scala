@@ -105,7 +105,7 @@ private[deploy] class SparkSubmitArguments(args: Seq[String], env: Map[String, S
   }
 
   // Set parameters from command line arguments
-  parse(args.asJava)
+  parse(args.asJava)// TODO:wo_note:
 
   // Populate `sparkProperties` map from properties file
   mergeDefaultSparkProperties()

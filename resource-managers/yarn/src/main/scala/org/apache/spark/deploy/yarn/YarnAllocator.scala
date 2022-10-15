@@ -259,7 +259,7 @@ private[yarn] class YarnAllocator(
     // requests.
     val allocateResponse = amClient.allocate(progressIndicator)
 
-    val allocatedContainers = allocateResponse.getAllocatedContainers()
+    val allocatedContainers = allocateResponse.getAllocatedContainers()// TODO:wo_note:图.步5. 返回资源可用列表
     allocatorBlacklistTracker.setNumClusterNodes(allocateResponse.getNumClusterNodes)
 
     if (allocatedContainers.size > 0) {
@@ -271,7 +271,7 @@ private[yarn] class YarnAllocator(
           numExecutorsStarting.get,
           allocateResponse.getAvailableResources))
 
-      handleAllocatedContainers(allocatedContainers.asScala)
+      handleAllocatedContainers(allocatedContainers.asScala)// TODO:wo_note：启动executor的containers
     }
 
     val completedContainers = allocateResponse.getCompletedContainersStatuses()
@@ -478,7 +478,7 @@ private[yarn] class YarnAllocator(
       }
     }
 
-    runAllocatedContainers(containersToUse)
+    runAllocatedContainers(containersToUse)// TODO:wo_note：启动executor的containers
 
     logInfo("Received %d containers from YARN, launching executors on %d of them."
       .format(allocatedContainers.size, containersToUse.size))
@@ -568,7 +568,7 @@ private[yarn] class YarnAllocator(
                 securityMgr,
                 localResources,
                 ResourceProfile.DEFAULT_RESOURCE_PROFILE_ID // use until fully supported
-              ).run()
+              ).run()// TODO:wo_note：多线程启动executor；图.步6. 启动Executor
               updateInternalState()
             } catch {
               case e: Throwable =>

@@ -38,7 +38,7 @@ private[spark] trait SparkApplication {
  */
 private[deploy] class JavaMainApplication(klass: Class[_]) extends SparkApplication {
 
-  override def start(args: Array[String], conf: SparkConf): Unit = {
+  override def start(args: Array[String], conf: SparkConf): Unit = { // TODO:wo_note
     val mainMethod = klass.getMethod("main", new Array[String](0).getClass)
     if (!Modifier.isStatic(mainMethod.getModifiers)) {
       throw new IllegalStateException("The main method in the given main class must be static")
@@ -49,7 +49,7 @@ private[deploy] class JavaMainApplication(klass: Class[_]) extends SparkApplicat
       sys.props(k) = v
     }
 
-    mainMethod.invoke(null, args)
+    mainMethod.invoke(null, args) // TODO:wo_note:运行main方法，如yarn下的:org.apache.spark.deploy.yarn.YarnClusterApplication
   }
 
 }

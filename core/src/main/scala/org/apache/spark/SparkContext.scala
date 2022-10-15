@@ -605,7 +605,7 @@ class SparkContext(config: SparkConf) extends Logging {
     postApplicationStart()
 
     // Post init
-    _taskScheduler.postStartHook()
+    _taskScheduler.postStartHook() // TODO:wo_note:sparkContext初始化完成，返回sparkContext到Driver线程: org.apache.spark.scheduler.cluster.YarnClusterScheduler
     _env.metricsSystem.registerSource(_dagScheduler.metricsSource)
     _env.metricsSystem.registerSource(new BlockManagerSource(_env.blockManager))
     _env.metricsSystem.registerSource(new JVMCPUSource())

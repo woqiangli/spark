@@ -29,8 +29,8 @@ private[spark] class YarnClusterScheduler(sc: SparkContext) extends YarnSchedule
   logInfo("Created YarnClusterScheduler")
 
   override def postStartHook(): Unit = {
-    ApplicationMaster.sparkContextInitialized(sc)
-    super.postStartHook()
+    ApplicationMaster.sparkContextInitialized(sc)// TODO:wo_note:返回sparkConext
+    super.postStartHook()// TODO:wo_note:阻塞，等待Driver线程申请资源完成(org.apache.spark.deploy.yarn.ApplicationMaster.resumeDriver调用)
     logInfo("YarnClusterScheduler.postStartHook done")
   }
 

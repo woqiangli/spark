@@ -69,7 +69,7 @@ private[spark] class YarnCoarseGrainedExecutorBackend(
 
 private[spark] object YarnCoarseGrainedExecutorBackend extends Logging {
 
-  def main(args: Array[String]): Unit = {
+  def main(args: Array[String]): Unit = {// TODO:wo_note:executor container的main方法
     val createFn: (RpcEnv, CoarseGrainedExecutorBackend.Arguments, SparkEnv, ResourceProfile) =>
       CoarseGrainedExecutorBackend = { case (rpcEnv, arguments, env, resourceProfile) =>
       new YarnCoarseGrainedExecutorBackend(rpcEnv, arguments.driverUrl, arguments.executorId,
@@ -78,7 +78,7 @@ private[spark] object YarnCoarseGrainedExecutorBackend extends Logging {
     }
     val backendArgs = CoarseGrainedExecutorBackend.parseArguments(args,
       this.getClass.getCanonicalName.stripSuffix("$"))
-    CoarseGrainedExecutorBackend.run(backendArgs, createFn)
+    CoarseGrainedExecutorBackend.run(backendArgs, createFn)// TODO:wo_note:
     System.exit(0)
   }
 

@@ -91,10 +91,10 @@ private[spark] class CoarseGrainedExecutorBackend(
       // This is a very fast action so we can use "ThreadUtils.sameThread"
       driver = Some(ref)
       ref.ask[Boolean](RegisterExecutor(executorId, self, hostname, cores, extractLogUrls,
-        extractAttributes, _resources, resourceProfile.id))
+        extractAttributes, _resources, resourceProfile.id)) // TODO:wo_note:实现: org.apache.spark.scheduler.cluster.CoarseGrainedSchedulerBackend.DriverEndpoint.receiveAndReply; 图.步7. 注册Executor
     }(ThreadUtils.sameThread).onComplete {
       case Success(_) =>
-        self.send(RegisteredExecutor)
+        self.send(RegisteredExecutor)// TODO:wo_note:发送消息，通知executor注册完毕，处理方法: receive;图.步8. 注册成功
       case Failure(e) =>
         exitExecutor(1, s"Cannot register with driver: $driverUrl", e, notifyDriver = false)
     }(ThreadUtils.sameThread)
@@ -145,12 +145,12 @@ private[spark] class CoarseGrainedExecutorBackend(
   }
 
   override def receive: PartialFunction[Any, Unit] = {
-    case RegisteredExecutor =>
+    case RegisteredExecutor => // TODO:wo_note:处理executor注册
       logInfo("Successfully registered with driver")
       try {
         executor = new Executor(executorId, hostname, env, userClassPath, isLocal = false,
-          resources = _resources)
-        driver.get.send(LaunchedExecutor(executorId))
+          resources = _resources)// TODO:wo_note:图.步9. 创建executor计算对象
+        driver.get.send(LaunchedExecutor(executorId))// TODO:wo_note:向driver发送，sparkContext接收，处理方法: org.apache.spark.scheduler.cluster.CoarseGrainedSchedulerBackend.DriverEndpoint.receive
       } catch {
         case NonFatal(e) =>
           exitExecutor(1, "Unable to create executor due to " + e.getMessage, e)
@@ -300,7 +300,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
       val nTries = 3
       for (i <- 0 until nTries if driver == null) {
         try {
-          driver = fetcher.setupEndpointRefByURI(arguments.driverUrl)
+          driver = fetcher.setupEndpointRefByURI(arguments.driverUrl)// TODO:wo_note:找到driver
         } catch {
           case e: Throwable => if (i == nTries - 1) {
             throw e
@@ -332,7 +332,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
         arguments.hostname, arguments.cores, cfg.ioEncryptionKey, isLocal = false)
 
       env.rpcEnv.setupEndpoint("Executor",
-        backendCreateFn(env.rpcEnv, arguments, env, cfg.resourceProfile))
+        backendCreateFn(env.rpcEnv, arguments, env, cfg.resourceProfile))// TODO:wo_note:设置endPoint，触发onStart，实现: org.apache.spark.rpc.netty.NettyRpcEnv.setupEndpoint
       arguments.workerUrl.foreach { url =>
         env.rpcEnv.setupEndpoint("WorkerWatcher", new WorkerWatcher(env.rpcEnv, url))
       }
