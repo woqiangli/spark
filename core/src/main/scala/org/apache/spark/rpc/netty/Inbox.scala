@@ -60,7 +60,7 @@ private[netty] class Inbox(val endpointName: String, val endpoint: RpcEndpoint)
   inbox =>  // Give this an alias so we can use it more clearly in closures.
 
   @GuardedBy("this")
-  protected val messages = new java.util.LinkedList[InboxMessage]()// TODO:wo_note:
+  protected val messages = new java.util.LinkedList[InboxMessage]()// TODO:wo_note:收到的event message
 
   /** True if the inbox (and its associated endpoint) is stopped. */
   @GuardedBy("this")

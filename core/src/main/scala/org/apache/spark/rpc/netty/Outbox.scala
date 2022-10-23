@@ -100,7 +100,7 @@ private[netty] class Outbox(nettyEnv: NettyRpcEnv, val address: RpcAddress) {
   private val messages = new java.util.LinkedList[OutboxMessage]
 
   @GuardedBy("this")
-  private var client: TransportClient = null
+  private var client: TransportClient = null// TODO:wo_note:连接client
 
   /**
    * connectFuture points to the connect task. If there is no connect task, connectFuture will be

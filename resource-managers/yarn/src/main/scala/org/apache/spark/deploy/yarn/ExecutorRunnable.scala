@@ -98,7 +98,7 @@ private[yarn] class ExecutorRunnable(
     credentials.writeTokenStorageToStream(dob)
     ctx.setTokens(ByteBuffer.wrap(dob.getData()))
 
-    val commands = prepareCommand()// TODO:wo_note：executor container的运行命令
+    val commands = prepareCommand() // TODO:wo_note：executor container的运行命令
 
     ctx.setCommands(commands.asJava)
     ctx.setApplicationACLs(

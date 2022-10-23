@@ -54,7 +54,7 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv, numUsableCores: Int) exte
 
   def registerRpcEndpoint(name: String, endpoint: RpcEndpoint): NettyRpcEndpointRef = {
     val addr = RpcEndpointAddress(nettyEnv.address, name)
-    val endpointRef = new NettyRpcEndpointRef(nettyEnv.conf, addr, nettyEnv)
+    val endpointRef = new NettyRpcEndpointRef(nettyEnv.conf, addr, nettyEnv)// TODO:wo_note:将自己也注册为ref
     synchronized {
       if (stopped) {
         throw new IllegalStateException("RpcEnv has been stopped")
@@ -77,7 +77,7 @@ private[netty] class Dispatcher(nettyEnv: NettyRpcEnv, numUsableCores: Int) exte
             sharedLoop.register(name, endpoint)
             sharedLoop
         }
-        endpoints.put(name, messageLoop)
+        endpoints.put(name, messageLoop)// TODO:wo_note:在Dispatchher中绑定收信箱
       } catch {
         case NonFatal(e) =>
           endpointRefs.remove(endpoint)

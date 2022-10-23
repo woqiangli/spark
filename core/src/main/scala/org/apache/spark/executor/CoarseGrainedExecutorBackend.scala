@@ -329,7 +329,7 @@ private[spark] object CoarseGrainedExecutorBackend extends Logging {
 
       driverConf.set(EXECUTOR_ID, arguments.executorId)
       val env = SparkEnv.createExecutorEnv(driverConf, arguments.executorId, arguments.bindAddress,
-        arguments.hostname, arguments.cores, cfg.ioEncryptionKey, isLocal = false)
+        arguments.hostname, arguments.cores, cfg.ioEncryptionKey, isLocal = false)// TODO:wo_note:executor端创建rpcEnv
 
       env.rpcEnv.setupEndpoint("Executor",
         backendCreateFn(env.rpcEnv, arguments, env, cfg.resourceProfile))// TODO:wo_note:设置endPoint，触发onStart，实现: org.apache.spark.rpc.netty.NettyRpcEnv.setupEndpoint

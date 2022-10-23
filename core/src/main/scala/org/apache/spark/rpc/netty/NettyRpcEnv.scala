@@ -103,7 +103,7 @@ private[netty] class NettyRpcEnv(
    * A map for [[RpcAddress]] and [[Outbox]]. When we are connecting to a remote [[RpcAddress]],
    * we just put messages to its [[Outbox]] to implement a non-blocking `send` method.
    */
-  private val outboxes = new ConcurrentHashMap[RpcAddress, Outbox]()
+  private val outboxes = new ConcurrentHashMap[RpcAddress, Outbox]() // TODO:wo_note:发件箱
 
   /**
    * Remove the address's Outbox and stop it.
@@ -122,9 +122,9 @@ private[netty] class NettyRpcEnv(
       } else {
         java.util.Collections.emptyList()
       }
-    server = transportContext.createServer(bindAddress, port, bootstraps)
+    server = transportContext.createServer(bindAddress, port, bootstraps) // TODO:wo_note:启动监听
     dispatcher.registerRpcEndpoint(
-      RpcEndpointVerifier.NAME, new RpcEndpointVerifier(this, dispatcher))
+      RpcEndpointVerifier.NAME, new RpcEndpointVerifier(this, dispatcher))// TODO:wo_note:将自己注册为endpoint
   }
 
   @Nullable
@@ -486,11 +486,11 @@ private[rpc] class NettyRpcEnvFactory extends RpcEnvFactory with Logging {
         config.securityManager, config.numUsableCores)
     if (!config.clientMode) {
       val startNettyRpcEnv: Int => (NettyRpcEnv, Int) = { actualPort =>
-        nettyEnv.startServer(config.bindAddress, actualPort)
+        nettyEnv.startServer(config.bindAddress, actualPort) // TODO:wo_note:startServer实现
         (nettyEnv, nettyEnv.address.port)
       }
       try {
-        Utils.startServiceOnPort(config.port, startNettyRpcEnv, sparkConf, config.name)._1
+        Utils.startServiceOnPort(config.port, startNettyRpcEnv, sparkConf, config.name)._1 // TODO:wo_note
       } catch {
         case NonFatal(e) =>
           nettyEnv.shutdown()

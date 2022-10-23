@@ -81,7 +81,7 @@ public class TransportServer implements Closeable {
 
     boolean shouldClose = true;
     try {
-      init(hostToBind, portToBind);
+      init(hostToBind, portToBind);// TODO:wo_note:初始化
       shouldClose = false;
     } finally {
       if (shouldClose) {
@@ -107,7 +107,7 @@ public class TransportServer implements Closeable {
 
     bootstrap = new ServerBootstrap()
       .group(bossGroup, workerGroup)
-      .channel(NettyUtils.getServerChannelClass(ioMode))
+      .channel(NettyUtils.getServerChannelClass(ioMode)) // TODO:wo_note
       .option(ChannelOption.ALLOCATOR, pooledAllocator)
       .option(ChannelOption.SO_REUSEADDR, !SystemUtils.IS_OS_WINDOWS)
       .childOption(ChannelOption.ALLOCATOR, pooledAllocator);

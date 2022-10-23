@@ -945,7 +945,7 @@ private[spark] object InProcessSparkSubmit {
 
   def main(args: Array[String]): Unit = {
     val submit = new SparkSubmit()
-    submit.doSubmit(args)
+    submit.doSubmit(args) //TODO:wo_note:sumbitmain方法
   }
 
 }

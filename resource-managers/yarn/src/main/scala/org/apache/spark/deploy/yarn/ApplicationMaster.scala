@@ -837,9 +837,9 @@ object ApplicationMaster extends Logging {
 
   private var master: ApplicationMaster = _
 
-  def main(args: Array[String]): Unit = {// TODO:wo_note:sumbit后，运行的main方法;图.步2. 启动ApplicationMaster
+  def main(args: Array[String]): Unit = { // TODO:wo_note:sumbit后，运行的main方法;图.步2. 启动ApplicationMaster
     SignalUtils.registerLogger(log)
-    val amArgs = new ApplicationMasterArguments(args)// TODO:wo_note:封装参数
+    val amArgs = new ApplicationMasterArguments(args) // TODO:wo_note:封装参数
     val sparkConf = new SparkConf()
     if (amArgs.propertiesFile != null) {
       Utils.getPropertiesFromFile(amArgs.propertiesFile).foreach { case (k, v) =>

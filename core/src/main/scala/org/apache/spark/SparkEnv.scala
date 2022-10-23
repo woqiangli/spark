@@ -176,7 +176,7 @@ object SparkEnv extends Logging {
     } else {
       None
     }
-    create(
+    create(// TODO:wo_note
       conf,
       SparkContext.DRIVER_IDENTIFIER,
       bindAddress,
@@ -263,7 +263,7 @@ object SparkEnv extends Logging {
 
     val systemName = if (isDriver) driverSystemName else executorSystemName
     val rpcEnv = RpcEnv.create(systemName, bindAddress, advertiseAddress, port.getOrElse(-1), conf,
-      securityManager, numUsableCores, !isDriver)
+      securityManager, numUsableCores, !isDriver)// TODO:wo_note:创建netty env
 
     // Figure out which port RpcEnv actually bound to in case the original port is 0 or occupied.
     if (isDriver) {

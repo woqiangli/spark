@@ -162,7 +162,7 @@ private class DedicatedMessageLoop(
     dispatcher: Dispatcher)
   extends MessageLoop(dispatcher) {
 
-  private val inbox = new Inbox(name, endpoint)// TODO:wo_note:inbox
+  private val inbox = new Inbox(name, endpoint)// TODO:wo_note:inbox收信箱
 
   override protected val threadpool = if (endpoint.threadCount() > 1) {
     ThreadUtils.newDaemonCachedThreadPool(s"dispatcher-$name", endpoint.threadCount())
