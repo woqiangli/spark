@@ -92,7 +92,7 @@ class PairRDDFunctions[K, V](self: RDD[(K, V)])
         new InterruptibleIterator(context, aggregator.combineValuesByKey(iter, context))
       }, preservesPartitioning = true)
     } else {
-      new ShuffledRDD[K, V, C](self, partitioner)
+      new ShuffledRDD[K, V, C](self, partitioner) // TODO:wo_note:ShuffledRDD
         .setSerializer(serializer)
         .setAggregator(aggregator)
         .setMapSideCombine(mapSideCombine)

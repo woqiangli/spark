@@ -192,20 +192,20 @@ class SparkContext(config: SparkConf) extends Logging {
    | constructor is still running is safe.                                                 |
    * ------------------------------------------------------------------------------------- */
 
-  private var _conf: SparkConf = _
+  private var _conf: SparkConf = _ // TODO:wo_note:配置对象
   private var _eventLogDir: Option[URI] = None
   private var _eventLogCodec: Option[String] = None
   private var _listenerBus: LiveListenerBus = _
-  private var _env: SparkEnv = _
+  private var _env: SparkEnv = _ // TODO:wo_note:netty rpc evn，通讯对象
   private var _statusTracker: SparkStatusTracker = _
   private var _progressBar: Option[ConsoleProgressBar] = None
   private var _ui: Option[SparkUI] = None
   private var _hadoopConfiguration: Configuration = _
   private var _executorMemory: Int = _
-  private var _schedulerBackend: SchedulerBackend = _
-  private var _taskScheduler: TaskScheduler = _
+  private var _schedulerBackend: SchedulerBackend = _ // TODO:wo_note:通讯后台，跟executor backend通讯
+  private var _taskScheduler: TaskScheduler = _ // TODO:wo_note:任务调度器
   private var _heartbeatReceiver: RpcEndpointRef = _
-  @volatile private var _dagScheduler: DAGScheduler = _
+  @volatile private var _dagScheduler: DAGScheduler = _ // TODO:wo_note:阶段调度器
   private var _applicationId: String = _
   private var _applicationAttemptId: Option[String] = None
   private var _eventLogger: Option[EventLoggingListener] = None
@@ -2090,7 +2090,7 @@ class SparkContext(config: SparkConf) extends Logging {
     if (conf.getBoolean("spark.logLineage", false)) {
       logInfo("RDD's recursive dependencies:\n" + rdd.toDebugString)
     }
-    dagScheduler.runJob(rdd, cleanedFunc, partitions, callSite, resultHandler, localProperties.get)
+    dagScheduler.runJob(rdd, cleanedFunc, partitions, callSite, resultHandler, localProperties.get)// TODO:wo_note
     progressBar.foreach(_.finishAll())
     rdd.doCheckpoint()
   }
@@ -2111,7 +2111,7 @@ class SparkContext(config: SparkConf) extends Logging {
       func: (TaskContext, Iterator[T]) => U,
       partitions: Seq[Int]): Array[U] = {
     val results = new Array[U](partitions.size)
-    runJob[T, U](rdd, func, partitions, (index, res) => results(index) = res)
+    runJob[T, U](rdd, func, partitions, (index, res) => results(index) = res)// TODO:wo_note
     results
   }
 
@@ -2130,7 +2130,7 @@ class SparkContext(config: SparkConf) extends Logging {
       func: Iterator[T] => U,
       partitions: Seq[Int]): Array[U] = {
     val cleanedFunc = clean(func)
-    runJob(rdd, (ctx: TaskContext, it: Iterator[T]) => cleanedFunc(it), partitions)
+    runJob(rdd, (ctx: TaskContext, it: Iterator[T]) => cleanedFunc(it), partitions)// TODO:wo_note
   }
 
   /**
@@ -2155,7 +2155,7 @@ class SparkContext(config: SparkConf) extends Logging {
    * a result from one partition)
    */
   def runJob[T, U: ClassTag](rdd: RDD[T], func: Iterator[T] => U): Array[U] = {
-    runJob(rdd, func, 0 until rdd.partitions.length)
+    runJob(rdd, func, 0 until rdd.partitions.length)// TODO:wo_note
   }
 
   /**

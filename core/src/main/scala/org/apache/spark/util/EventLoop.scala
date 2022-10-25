@@ -41,12 +41,12 @@ private[spark] abstract class EventLoop[E](name: String) extends Logging {
   private[spark] val eventThread = new Thread(name) {
     setDaemon(true)
 
-    override def run(): Unit = {
+    override def run(): Unit = {// TODO:wo_note:处理event
       try {
         while (!stopped.get) {
           val event = eventQueue.take()
           try {
-            onReceive(event)
+            onReceive(event)// TODO:wo_note
           } catch {
             case NonFatal(e) =>
               try {
@@ -102,7 +102,7 @@ private[spark] abstract class EventLoop[E](name: String) extends Logging {
   def post(event: E): Unit = {
     if (!stopped.get) {
       if (eventThread.isAlive) {
-        eventQueue.put(event)
+        eventQueue.put(event)// TODO:wo_note:event进队，异步处理
       } else {
         onError(new IllegalStateException(s"$name has already been stopped accidentally."))
       }

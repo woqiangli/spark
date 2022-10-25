@@ -105,7 +105,7 @@ abstract class RDD[T: ClassTag](
 
   /** Construct an RDD with just a one-to-one dependency on one parent */
   def this(@transient oneParent: RDD[_]) =
-    this(oneParent.context, List(new OneToOneDependency(oneParent)))
+    this(oneParent.context, List(new OneToOneDependency(oneParent))) // TODO:wo_note:OneToOneDependen
 
   private[spark] def conf = sc.conf
   // =======================================================================
@@ -1000,7 +1000,7 @@ abstract class RDD[T: ClassTag](
    * @note This method should only be used if the resulting array is expected to be small, as
    * all the data is loaded into the driver's memory.
    */
-  def collect(): Array[T] = withScope {
+  def collect(): Array[T] = withScope { // TODO:wo_note:行动算子collect，stage划分开始
     val results = sc.runJob(this, (iter: Iterator[T]) => iter.toArray)
     Array.concat(results: _*)
   }

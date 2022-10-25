@@ -115,7 +115,7 @@ private[scheduler] abstract class Stage(
   }
 
   /** Returns the sequence of partition ids that are missing (i.e. needs to be computed). */
-  def findMissingPartitions(): Seq[Int]
+  def findMissingPartitions(): Seq[Int] // TODO:wo_note:实现org.apache.spark.scheduler.ShuffleMapStage.findMissingPartitions
 
   def isIndeterminate: Boolean = {
     rdd.outputDeterministicLevel == DeterministicLevel.INDETERMINATE
