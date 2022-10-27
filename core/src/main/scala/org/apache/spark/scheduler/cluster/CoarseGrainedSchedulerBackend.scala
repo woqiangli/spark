@@ -166,8 +166,8 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
           }
         }
 
-      case ReviveOffers =>
-        makeOffers()
+      case ReviveOffers => // TODO:wo_note:处理任务出队消息
+        makeOffers()// TODO:wo_note:
 
       case KillTask(taskId, executorId, interruptThread, reason) =>
         executorDataMap.get(executorId) match {
@@ -286,7 +286,7 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
     // Make fake resource offers on all executors
     private def makeOffers(): Unit = {
       // Make sure no executor is killed while some task is launching on it
-      val taskDescs = withLock {
+      val taskDescs = withLock {// TODO:wo_note:
         // Filter out executors under killing
         val activeExecutors = executorDataMap.filterKeys(isExecutorActive)
         val workOffers = activeExecutors.map {
@@ -297,10 +297,10 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
                 (rName, rInfo.availableAddrs.toBuffer)
               })
         }.toIndexedSeq
-        scheduler.resourceOffers(workOffers)
+        scheduler.resourceOffers(workOffers)// TODO:wo_note:
       }
       if (taskDescs.nonEmpty) {
-        launchTasks(taskDescs)
+        launchTasks(taskDescs)// TODO:wo_note:启动任务
       }
     }
 
@@ -337,7 +337,7 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
 
     // Launch tasks returned by a set of resource offers
     private def launchTasks(tasks: Seq[Seq[TaskDescription]]): Unit = {
-      for (task <- tasks.flatten) {
+      for (task <- tasks.flatten) {// TODO:wo_note:轮询task set中得task
         val serializedTask = TaskDescription.encode(task)
         if (serializedTask.limit() >= maxRpcMessageSize) {
           Option(scheduler.taskIdToTaskSetManager.get(task.taskId)).foreach { taskSetMgr =>
@@ -365,7 +365,7 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
           logDebug(s"Launching task ${task.taskId} on executor id: ${task.executorId} hostname: " +
             s"${executorData.executorHost}.")
 
-          executorData.executorEndpoint.send(LaunchTask(new SerializableBuffer(serializedTask)))
+          executorData.executorEndpoint.send(LaunchTask(new SerializableBuffer(serializedTask)))// TODO:wo_note:根据本地化策略选出executor，task序列化后发到对应executor执行，executor处理在org.apache.spark.executor.CoarseGrainedExecutorBackend#receive，159
         }
       }
     }
@@ -507,7 +507,7 @@ class CoarseGrainedSchedulerBackend(scheduler: TaskSchedulerImpl, val rpcEnv: Rp
   }
 
   override def reviveOffers(): Unit = {
-    driverEndpoint.send(ReviveOffers)
+    driverEndpoint.send(ReviveOffers)// TODO:wo_note:发消息，处理在169行
   }
 
   override def killTask(

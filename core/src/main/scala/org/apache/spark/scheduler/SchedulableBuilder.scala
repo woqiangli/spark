@@ -50,7 +50,7 @@ private[spark] class FIFOSchedulableBuilder(val rootPool: Pool)
   }
 
   override def addTaskSetManager(manager: Schedulable, properties: Properties): Unit = {
-    rootPool.addSchedulable(manager)
+    rootPool.addSchedulable(manager) // TODO:wo_note:task 进池
   }
 }
 

@@ -223,9 +223,9 @@ private[spark] class Executor(
   private[executor] def numRunningTasks: Int = runningTasks.size()
 
   def launchTask(context: ExecutorBackend, taskDescription: TaskDescription): Unit = {
-    val tr = new TaskRunner(context, taskDescription)
+    val tr = new TaskRunner(context, taskDescription) // TODO:wo_note:task包装为runner
     runningTasks.put(taskDescription.taskId, tr)
-    threadPool.execute(tr)
+    threadPool.execute(tr) // TODO:wo_note:在线程池中运行
   }
 
   def killTask(taskId: Long, interruptThread: Boolean, reason: String): Unit = {
@@ -378,7 +378,7 @@ private[spark] class Executor(
       (accums, accUpdates)
     }
 
-    override def run(): Unit = {
+    override def run(): Unit = { // TODO:wo_note:runner具体逻辑
       threadId = Thread.currentThread.getId
       Thread.currentThread.setName(threadName)
       val threadMXBean = ManagementFactory.getThreadMXBean
@@ -437,7 +437,7 @@ private[spark] class Executor(
         } else 0L
         var threwException = true
         val value = Utils.tryWithSafeFinally {
-          val res = task.run(
+          val res = task.run( // TODO:wo_note:task run
             taskAttemptId = taskId,
             attemptNumber = taskDescription.attemptNumber,
             metricsSystem = env.metricsSystem,

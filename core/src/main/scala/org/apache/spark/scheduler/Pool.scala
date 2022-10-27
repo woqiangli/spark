@@ -47,7 +47,7 @@ private[spark] class Pool(
   val name = poolName
   var parent: Pool = null
 
-  private val taskSetSchedulingAlgorithm: SchedulingAlgorithm = {
+  private val taskSetSchedulingAlgorithm: SchedulingAlgorithm = {// TODO:wo_note:调度算法
     schedulingMode match {
       case SchedulingMode.FAIR =>
         new FairSchedulingAlgorithm()
@@ -99,7 +99,7 @@ private[spark] class Pool(
   override def getSortedTaskSetQueue: ArrayBuffer[TaskSetManager] = {
     val sortedTaskSetQueue = new ArrayBuffer[TaskSetManager]
     val sortedSchedulableQueue =
-      schedulableQueue.asScala.toSeq.sortWith(taskSetSchedulingAlgorithm.comparator)
+      schedulableQueue.asScala.toSeq.sortWith(taskSetSchedulingAlgorithm.comparator)// TODO:wo_note:跟就调度器，选择调度算法
     for (schedulable <- sortedSchedulableQueue) {
       sortedTaskSetQueue ++= schedulable.getSortedTaskSetQueue
     }

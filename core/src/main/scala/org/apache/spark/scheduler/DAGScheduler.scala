@@ -1092,7 +1092,7 @@ private[spark] class DAGScheduler(
         logDebug("missing: " + missing)
         if (missing.isEmpty) {
           logInfo("Submitting " + stage + " (" + stage.rdd + "), which has no missing parents")
-          submitMissingTasks(stage, jobId.get) // TODO:wo_note:没交stage，生成task
+          submitMissingTasks(stage, jobId.get) // TODO:wo_note:提交stage，生成task
         } else {
           for (parent <- missing) {
             submitStage(parent) // TODO:wo_note:从最后一个stage递归到第一个第一个stage
@@ -1106,7 +1106,7 @@ private[spark] class DAGScheduler(
   }
 
   /** Called when stage's parents are available and we can now do its task. */
-  private def submitMissingTasks(stage: Stage, jobId: Int): Unit = {
+  private def submitMissingTasks(stage: Stage, jobId: Int): Unit = {// TODO:wo_note:task submit to executor
     logDebug("submitMissingTasks(" + stage + ")")
 
     // Before find missing partition, do the intermediate state clean work first.
@@ -1219,7 +1219,7 @@ private[spark] class DAGScheduler(
       stage match {
         case stage: ShuffleMapStage => // TODO:wo_note:ShuffleMapStage转为task
           stage.pendingPartitions.clear()
-          partitionsToCompute.map { id =>// TODO:wo_note
+          partitionsToCompute.map { id =>// TODO:wo_note:task数量=分区数
             val locs = taskIdToLocations(id)
             val part = partitions(id)
             stage.pendingPartitions += id
@@ -1249,7 +1249,7 @@ private[spark] class DAGScheduler(
     if (tasks.nonEmpty) {
       logInfo(s"Submitting ${tasks.size} missing tasks from $stage (${stage.rdd}) (first 15 " +
         s"tasks are for partitions ${tasks.take(15).map(_.partitionId)})")
-      taskScheduler.submitTasks(new TaskSet(
+      taskScheduler.submitTasks(new TaskSet( // TODO:wo_note:包装为taskSet，提交任务，实现:org.apache.spark.scheduler.TaskSchedulerImpl.submitTasks
         tasks.toArray, stage.id, stage.latestInfo.attemptNumber, jobId, properties))
     } else {
       // Because we posted SparkListenerStageSubmitted earlier, we should mark

@@ -149,21 +149,21 @@ private[spark] class CoarseGrainedExecutorBackend(
       logInfo("Successfully registered with driver")
       try {
         executor = new Executor(executorId, hostname, env, userClassPath, isLocal = false,
-          resources = _resources)// TODO:wo_note:图.步9. 创建executor计算对象
+          resources = _resources) // TODO:wo_note:图.步9. 创建executor计算对象
         driver.get.send(LaunchedExecutor(executorId))// TODO:wo_note:向driver发送，sparkContext接收，处理方法: org.apache.spark.scheduler.cluster.CoarseGrainedSchedulerBackend.DriverEndpoint.receive
       } catch {
         case NonFatal(e) =>
           exitExecutor(1, "Unable to create executor due to " + e.getMessage, e)
       }
 
-    case LaunchTask(data) =>
+    case LaunchTask(data) => // TODO:wo_note:处理driver发送得task
       if (executor == null) {
         exitExecutor(1, "Received LaunchTask command but executor was null")
       } else {
         val taskDesc = TaskDescription.decode(data.value)
         logInfo("Got assigned task " + taskDesc.taskId)
         taskResources(taskDesc.taskId) = taskDesc.resources
-        executor.launchTask(this, taskDesc)
+        executor.launchTask(this, taskDesc) // TODO:wo_note:task反序列化后，在executor计算对象中执行
       }
 
     case KillTask(taskId, _, interruptThread, reason) =>

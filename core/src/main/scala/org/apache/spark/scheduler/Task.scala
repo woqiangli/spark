@@ -124,7 +124,7 @@ private[spark] abstract class Task[T](
       Option(attemptNumber)).setCurrentContext()
 
     try {
-      runTask(context)
+      runTask(context) // TODO:wo_note:真正执行从driver发送来得用户task得逻辑
     } catch {
       case e: Throwable =>
         // Catch all errors; run task failure callbacks, and rethrow the exception.

@@ -147,7 +147,7 @@ private[spark] class TaskSchedulerImpl(
   private var schedulableBuilder: SchedulableBuilder = null
   // default scheduler is FIFO
   private val schedulingModeConf = conf.get(SCHEDULER_MODE)
-  val schedulingMode: SchedulingMode =
+  val schedulingMode: SchedulingMode = // TODO:wo_note:默认为FIFO
     try {
       SchedulingMode.withName(schedulingModeConf.toUpperCase(Locale.ROOT))
     } catch {
@@ -181,10 +181,10 @@ private[spark] class TaskSchedulerImpl(
 
   def initialize(backend: SchedulerBackend): Unit = {
     this.backend = backend
-    schedulableBuilder = {
+    schedulableBuilder = {// TODO:wo_note:调度器
       schedulingMode match {
         case SchedulingMode.FIFO =>
-          new FIFOSchedulableBuilder(rootPool)
+          new FIFOSchedulableBuilder(rootPool)// TODO:wo_note:默认为先进先出
         case SchedulingMode.FAIR =>
           new FairSchedulableBuilder(rootPool, conf)
         case _ =>
@@ -216,7 +216,7 @@ private[spark] class TaskSchedulerImpl(
     val tasks = taskSet.tasks
     logInfo("Adding task set " + taskSet.id + " with " + tasks.length + " tasks")
     this.synchronized {
-      val manager = createTaskSetManager(taskSet, maxTaskFailures)
+      val manager = createTaskSetManager(taskSet, maxTaskFailures) // TODO:wo_note:注入task set，生成task manager
       val stage = taskSet.stageId
       val stageTaskSets =
         taskSetsByStageIdAndAttempt.getOrElseUpdate(stage, new HashMap[Int, TaskSetManager])
@@ -234,7 +234,7 @@ private[spark] class TaskSchedulerImpl(
         ts.isZombie = true
       }
       stageTaskSets(taskSet.stageAttemptId) = manager
-      schedulableBuilder.addTaskSetManager(manager, manager.taskSet.properties)
+      schedulableBuilder.addTaskSetManager(manager, manager.taskSet.properties)// TODO:wo_note:根据策略，向调度器加入taskManager
 
       if (!isLocal && !hasReceivedTask) {
         starvationTimer.scheduleAtFixedRate(new TimerTask() {
@@ -251,7 +251,7 @@ private[spark] class TaskSchedulerImpl(
       }
       hasReceivedTask = true
     }
-    backend.reviveOffers()
+    backend.reviveOffers()// TODO:wo_note:从调度器拿任务，实现：org.apache.spark.scheduler.cluster.CoarseGrainedSchedulerBackend.reviveOffers
   }
 
   // Label as private[scheduler] to allow tests to swap in different task set managers if necessary
@@ -433,7 +433,7 @@ private[spark] class TaskSchedulerImpl(
     val tasks = shuffledOffers.map(o => new ArrayBuffer[TaskDescription](o.cores / CPUS_PER_TASK))
     val availableResources = shuffledOffers.map(_.resources).toArray
     val availableCpus = shuffledOffers.map(o => o.cores).toArray
-    val sortedTaskSets = rootPool.getSortedTaskSetQueue.filterNot(_.isZombie)
+    val sortedTaskSets = rootPool.getSortedTaskSetQueue.filterNot(_.isZombie)// TODO:wo_note:task set 算法排序
     for (taskSet <- sortedTaskSets) {
       logDebug("parentName: %s, name: %s, runningTasks: %s".format(
         taskSet.parent.name, taskSet.name, taskSet.runningTasks))
@@ -459,7 +459,7 @@ private[spark] class TaskSchedulerImpl(
         var launchedAnyTask = false
         // Record all the executor IDs assigned barrier tasks on.
         val addressesWithDescs = ArrayBuffer[(String, TaskDescription)]()
-        for (currentMaxLocality <- taskSet.myLocalityLevels) {
+        for (currentMaxLocality <- taskSet.myLocalityLevels) {// TODO:wo_note:判断本地化级别
           var launchedTaskAtCurrentMaxLocality = false
           do {
             launchedTaskAtCurrentMaxLocality = resourceOfferSingleTaskSet(taskSet,
