@@ -192,8 +192,8 @@ private[spark] class ExternalSorter[K, V, C](
       while (records.hasNext) {
         addElementsRead()
         kv = records.next()
-        map.changeValue((getPartition(kv._1), kv._1), update)
-        maybeSpillCollection(usingMap = true)
+        map.changeValue((getPartition(kv._1), kv._1), update)// TODO:wo_note:预聚合
+        maybeSpillCollection(usingMap = true)// TODO:wo_note:内存溢写磁盘
       }
     } else {
       // Stick values into our buffer
@@ -213,12 +213,12 @@ private[spark] class ExternalSorter[K, V, C](
    */
   private def maybeSpillCollection(usingMap: Boolean): Unit = {
     var estimatedSize = 0L
-    if (usingMap) {
+    if (usingMap) {// TODO:wo_note:预聚合分支
       estimatedSize = map.estimateSize()
-      if (maybeSpill(map, estimatedSize)) {
+      if (maybeSpill(map, estimatedSize)) { // TODO:wo_note:可能溢写
         map = new PartitionedAppendOnlyMap[K, C]
       }
-    } else {
+    } else {// TODO:wo_note:else分支
       estimatedSize = buffer.estimateSize()
       if (maybeSpill(buffer, estimatedSize)) {
         buffer = new PartitionedPairBuffer[K, C]
@@ -268,7 +268,7 @@ private[spark] class ExternalSorter[K, V, C](
     // Because these files may be read during shuffle, their compression must be controlled by
     // spark.shuffle.compress instead of spark.shuffle.spill.compress, so we need to use
     // createTempShuffleBlock here; see SPARK-3426 for more context.
-    val (blockId, file) = diskBlockManager.createTempShuffleBlock()
+    val (blockId, file) = diskBlockManager.createTempShuffleBlock()// TODO:wo_note:创建临时文件
 
     // These variables are reset after each flush
     var objectsWritten: Long = 0
@@ -353,7 +353,7 @@ private[spark] class ExternalSorter[K, V, C](
       } else if (ordering.isDefined) {
         // No aggregator given, but we have an ordering (e.g. used by reduce tasks in sortByKey);
         // sort the elements without trying to merge them
-        (p, mergeSort(iterators, ordering.get))
+        (p, mergeSort(iterators, ordering.get))// TODO:wo_note:归并排序
       } else {
         (p, iterators.iterator.flatten)
       }
@@ -660,7 +660,7 @@ private[spark] class ExternalSorter[K, V, C](
     } else {
       // Merge spilled and in-memory data
       merge(spills, destructiveIterator(
-        collection.partitionedDestructiveSortedIterator(comparator)))
+        collection.partitionedDestructiveSortedIterator(comparator)))// TODO:wo_note:合并内存数据和磁盘临时文件的数据
     }
   }
 
@@ -733,7 +733,7 @@ private[spark] class ExternalSorter[K, V, C](
     if (spills.isEmpty) {
       // Case where we only have in-memory data
       val collection = if (aggregator.isDefined) map else buffer
-      val it = collection.destructiveSortedWritablePartitionedIterator(comparator)
+      val it = collection.destructiveSortedWritablePartitionedIterator(comparator) // TODO:wo_note:
       while (it.hasNext()) {
         val partitionId = it.nextPartition()
         var partitionWriter: ShufflePartitionWriter = null
@@ -759,7 +759,7 @@ private[spark] class ExternalSorter[K, V, C](
       }
     } else {
       // We must perform merge-sort; get an iterator by partition and write everything directly.
-      for ((id, elements) <- this.partitionedIterator) {
+      for ((id, elements) <- this.partitionedIterator) {// TODO:wo_note:
         val blockId = ShuffleBlockId(shuffleId, mapId, id)
         var partitionWriter: ShufflePartitionWriter = null
         var partitionPairsWriter: ShufflePartitionPairsWriter = null

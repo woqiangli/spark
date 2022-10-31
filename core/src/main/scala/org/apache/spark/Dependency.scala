@@ -93,7 +93,7 @@ class ShuffleDependency[K: ClassTag, V: ClassTag, C: ClassTag](
   val shuffleId: Int = _rdd.context.newShuffleId()
 
   val shuffleHandle: ShuffleHandle = _rdd.context.env.shuffleManager.registerShuffle(
-    shuffleId, this)
+    shuffleId, this)// TODO:wo_note:根据不同的条件，取得不同的handler，实现org.apache.spark.shuffle.sort.SortShuffleManager#registerShuffle
 
   _rdd.sparkContext.cleaner.foreach(_.registerShuffleForCleanup(this))
   _rdd.sparkContext.shuffleDriverComponents.registerShuffle(shuffleId)

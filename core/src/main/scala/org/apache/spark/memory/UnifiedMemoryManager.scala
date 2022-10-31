@@ -55,7 +55,7 @@ private[spark] class UnifiedMemoryManager(
     conf,
     numCores,
     onHeapStorageRegionSize,
-    maxHeapMemory - onHeapStorageRegionSize) {
+    maxHeapMemory - onHeapStorageRegionSize) { // TODO:wo_note:execute内存比例,default 0.5
 
   private def assertInvariants(): Unit = {
     assert(onHeapExecutionMemoryPool.poolSize + onHeapStorageMemoryPool.poolSize == maxHeapMemory)
@@ -198,22 +198,22 @@ object UnifiedMemoryManager {
   private val RESERVED_SYSTEM_MEMORY_BYTES = 300 * 1024 * 1024
 
   def apply(conf: SparkConf, numCores: Int): UnifiedMemoryManager = {
-    val maxMemory = getMaxMemory(conf)
+    val maxMemory = getMaxMemory(conf) // TODO:wo_note:运行和存储内存比例
     new UnifiedMemoryManager(
       conf,
       maxHeapMemory = maxMemory,
       onHeapStorageRegionSize =
         (maxMemory * conf.get(config.MEMORY_STORAGE_FRACTION)).toLong,
-      numCores = numCores)
+      numCores = numCores)// TODO:wo_note:存储内存比例,default 0.5
   }
 
   /**
    * Return the total amount of memory shared between execution and storage, in bytes.
    */
   private def getMaxMemory(conf: SparkConf): Long = {
-    val systemMemory = conf.get(TEST_MEMORY)
+    val systemMemory = conf.get(TEST_MEMORY) // TODO:wo_note:系统内存(JVM heap max size)
     val reservedMemory = conf.getLong(TEST_RESERVED_MEMORY.key,
-      if (conf.contains(IS_TESTING)) 0 else RESERVED_SYSTEM_MEMORY_BYTES)
+      if (conf.contains(IS_TESTING)) 0 else RESERVED_SYSTEM_MEMORY_BYTES) // TODO:wo_note:预留内存
     val minSystemMemory = (reservedMemory * 1.5).ceil.toLong
     if (systemMemory < minSystemMemory) {
       throw new IllegalArgumentException(s"System memory $systemMemory must " +
@@ -230,7 +230,7 @@ object UnifiedMemoryManager {
       }
     }
     val usableMemory = systemMemory - reservedMemory
-    val memoryFraction = conf.get(config.MEMORY_FRACTION)
+    val memoryFraction = conf.get(config.MEMORY_FRACTION) // TODO:wo_note:运行和存储内存比例
     (usableMemory * memoryFraction).toLong
   }
 }

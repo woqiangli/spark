@@ -96,7 +96,7 @@ private[spark] class SortShuffleManager(conf: SparkConf) extends ShuffleManager 
   override def registerShuffle[K, V, C](
       shuffleId: Int,
       dependency: ShuffleDependency[K, V, C]): ShuffleHandle = {
-    if (SortShuffleWriter.shouldBypassMergeSort(conf, dependency)) {
+    if (SortShuffleWriter.shouldBypassMergeSort(conf, dependency)) {// TODO:wo_note:
       // If there are fewer than spark.shuffle.sort.bypassMergeThreshold partitions and we don't
       // need map-side aggregation, then write numPartitions files directly and just concatenate
       // them at the end. This avoids doing serialization and deserialization twice to merge
@@ -104,11 +104,11 @@ private[spark] class SortShuffleManager(conf: SparkConf) extends ShuffleManager 
       // having multiple files open at a time and thus more memory allocated to buffers.
       new BypassMergeSortShuffleHandle[K, V](
         shuffleId, dependency.asInstanceOf[ShuffleDependency[K, V, V]])
-    } else if (SortShuffleManager.canUseSerializedShuffle(dependency)) {
+    } else if (SortShuffleManager.canUseSerializedShuffle(dependency)) {// TODO:wo_note:
       // Otherwise, try to buffer map outputs in a serialized form, since this is more efficient:
       new SerializedShuffleHandle[K, V](
         shuffleId, dependency.asInstanceOf[ShuffleDependency[K, V, V]])
-    } else {
+    } else {// TODO:wo_note:默认handler，需要排序
       // Otherwise, buffer map outputs in a deserialized form:
       new BaseShuffleHandle(shuffleId, dependency)
     }
@@ -126,7 +126,7 @@ private[spark] class SortShuffleManager(conf: SparkConf) extends ShuffleManager 
       metrics: ShuffleReadMetricsReporter): ShuffleReader[K, C] = {
     val blocksByAddress = SparkEnv.get.mapOutputTracker.getMapSizesByExecutorId(
       handle.shuffleId, startPartition, endPartition)
-    new BlockStoreShuffleReader(
+    new BlockStoreShuffleReader( // TODO:wo_note:
       handle.asInstanceOf[BaseShuffleHandle[K, _, C]], blocksByAddress, context, metrics,
       shouldBatchFetch = canUseBatchFetch(startPartition, endPartition, context))
   }
@@ -231,11 +231,11 @@ private[spark] object SortShuffleManager extends Logging {
   def canUseSerializedShuffle(dependency: ShuffleDependency[_, _, _]): Boolean = {
     val shufId = dependency.shuffleId
     val numPartitions = dependency.partitioner.numPartitions
-    if (!dependency.serializer.supportsRelocationOfSerializedObjects) {
+    if (!dependency.serializer.supportsRelocationOfSerializedObjects) {// TODO:wo_note:kryo支持
       log.debug(s"Can't use serialized shuffle for shuffle $shufId because the serializer, " +
         s"${dependency.serializer.getClass.getName}, does not support object relocation")
       false
-    } else if (dependency.mapSideCombine) {
+    } else if (dependency.mapSideCombine) {// TODO:wo_note:预聚合
       log.debug(s"Can't use serialized shuffle for shuffle $shufId because we need to do " +
         s"map-side aggregation")
       false

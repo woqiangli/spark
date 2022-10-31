@@ -163,7 +163,7 @@ private[spark] class IndexShuffleBlockResolver(
       mapId: Long,
       lengths: Array[Long],
       dataTmp: File): Unit = {
-    val indexFile = getIndexFile(shuffleId, mapId)
+    val indexFile = getIndexFile(shuffleId, mapId)// TODO:wo_note:index文件
     val indexTmp = Utils.tempFileWith(indexFile)
     try {
       val dataFile = getDataFile(shuffleId, mapId)
@@ -195,15 +195,15 @@ private[spark] class IndexShuffleBlockResolver(
           }
 
           if (indexFile.exists()) {
-            indexFile.delete()
+            indexFile.delete()// TODO:wo_note:数据文件
           }
           if (dataFile.exists()) {
-            dataFile.delete()
+            dataFile.delete()// TODO:wo_note:index文件
           }
-          if (!indexTmp.renameTo(indexFile)) {
+          if (!indexTmp.renameTo(indexFile)) {// TODO:wo_note:
             throw new IOException("fail to rename file " + indexTmp + " to " + indexFile)
           }
-          if (dataTmp != null && dataTmp.exists() && !dataTmp.renameTo(dataFile)) {
+          if (dataTmp != null && dataTmp.exists() && !dataTmp.renameTo(dataFile)) {// TODO:wo_note:
             throw new IOException("fail to rename file " + dataTmp + " to " + dataFile)
           }
         }

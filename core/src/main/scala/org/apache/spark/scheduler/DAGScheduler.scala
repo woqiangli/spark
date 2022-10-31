@@ -1223,17 +1223,17 @@ private[spark] class DAGScheduler(
             val locs = taskIdToLocations(id)
             val part = partitions(id)
             stage.pendingPartitions += id
-            new ShuffleMapTask(stage.id, stage.latestInfo.attemptNumber, // TODO:wo_note
+            new ShuffleMapTask(stage.id, stage.latestInfo.attemptNumber, // TODO:wo_note:shuffle写操作，写磁盘
               taskBinary, part, locs, properties, serializedTaskMetrics, Option(jobId),
               Option(sc.applicationId), sc.applicationAttemptId, stage.rdd.isBarrier())
           }
 
-        case stage: ResultStage =>
+        case stage: ResultStage => // TODO:wo_note:shuffle读操作
           partitionsToCompute.map { id =>
             val p: Int = stage.partitions(id)
             val part = partitions(p)
             val locs = taskIdToLocations(id)
-            new ResultTask(stage.id, stage.latestInfo.attemptNumber,
+            new ResultTask(stage.id, stage.latestInfo.attemptNumber,// TODO:wo_note:
               taskBinary, part, locs, id, properties, serializedTaskMetrics,
               Option(jobId), Option(sc.applicationId), sc.applicationAttemptId,
               stage.rdd.isBarrier())

@@ -87,7 +87,7 @@ private[spark] class ResultTask[T, U](
       threadMXBean.getCurrentThreadCpuTime - deserializeStartCpuTime
     } else 0L
 
-    func(context, rdd.iterator(partition, context))
+    func(context, rdd.iterator(partition, context))// TODO:wo_note:
   }
 
   // This is only callable on the driver side.

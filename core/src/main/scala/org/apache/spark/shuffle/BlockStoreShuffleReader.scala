@@ -120,7 +120,7 @@ private[spark] class BlockStoreShuffleReader[K, C](
     }
 
     // Sort the output if there is a sort ordering defined.
-    val resultIter = dep.keyOrdering match {
+    val resultIter = dep.keyOrdering match { // TODO:wo_note:
       case Some(keyOrd: Ordering[K]) =>
         // Create an ExternalSorter to sort the data.
         val sorter =
@@ -138,7 +138,7 @@ private[spark] class BlockStoreShuffleReader[K, C](
         aggregatedIter
     }
 
-    resultIter match {
+    resultIter match { // TODO:wo_note:
       case _: InterruptibleIterator[Product2[K, C]] => resultIter
       case _ =>
         // Use another interruptible iterator here to support task cancellation as aggregator

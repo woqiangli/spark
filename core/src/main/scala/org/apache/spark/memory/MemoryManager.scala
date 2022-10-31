@@ -46,20 +46,20 @@ private[spark] abstract class MemoryManager(
   // -- Methods related to memory allocation policies and bookkeeping ------------------------------
 
   @GuardedBy("this")
-  protected val onHeapStorageMemoryPool = new StorageMemoryPool(this, MemoryMode.ON_HEAP)
+  protected val onHeapStorageMemoryPool = new StorageMemoryPool(this, MemoryMode.ON_HEAP) // TODO:wo_note:堆内Storage内存
   @GuardedBy("this")
-  protected val offHeapStorageMemoryPool = new StorageMemoryPool(this, MemoryMode.OFF_HEAP)
+  protected val offHeapStorageMemoryPool = new StorageMemoryPool(this, MemoryMode.OFF_HEAP) // TODO:wo_note:堆外Storage内存
   @GuardedBy("this")
-  protected val onHeapExecutionMemoryPool = new ExecutionMemoryPool(this, MemoryMode.ON_HEAP)
+  protected val onHeapExecutionMemoryPool = new ExecutionMemoryPool(this, MemoryMode.ON_HEAP) // TODO:wo_note:堆内Execution内存
   @GuardedBy("this")
-  protected val offHeapExecutionMemoryPool = new ExecutionMemoryPool(this, MemoryMode.OFF_HEAP)
+  protected val offHeapExecutionMemoryPool = new ExecutionMemoryPool(this, MemoryMode.OFF_HEAP) // TODO:wo_note:堆外Execution内存
 
   onHeapStorageMemoryPool.incrementPoolSize(onHeapStorageMemory)
   onHeapExecutionMemoryPool.incrementPoolSize(onHeapExecutionMemory)
 
-  protected[this] val maxOffHeapMemory = conf.get(MEMORY_OFFHEAP_SIZE)
+  protected[this] val maxOffHeapMemory = conf.get(MEMORY_OFFHEAP_SIZE) // TODO:wo_note:堆外内存
   protected[this] val offHeapStorageMemory =
-    (maxOffHeapMemory * conf.get(MEMORY_STORAGE_FRACTION)).toLong
+    (maxOffHeapMemory * conf.get(MEMORY_STORAGE_FRACTION)).toLong // TODO:wo_note:堆外内存比例
 
   offHeapExecutionMemoryPool.incrementPoolSize(maxOffHeapMemory - offHeapStorageMemory)
   offHeapStorageMemoryPool.incrementPoolSize(offHeapStorageMemory)

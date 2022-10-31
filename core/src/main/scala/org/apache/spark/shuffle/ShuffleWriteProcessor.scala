@@ -49,14 +49,14 @@ private[spark] class ShuffleWriteProcessor extends Serializable with Logging {
       partition: Partition): MapStatus = {
     var writer: ShuffleWriter[Any, Any] = null
     try {
-      val manager = SparkEnv.get.shuffleManager
-      writer = manager.getWriter[Any, Any](
-        dep.shuffleHandle,
+      val manager = SparkEnv.get.shuffleManager// TODO:wo_note:shuffleManager
+      writer = manager.getWriter[Any, Any](// TODO:wo_note:实现org.apache.spark.shuffle.sort.SortShuffleManager
+        dep.shuffleHandle,// TODO:wo_note:
         mapId,
         context,
         createMetricsReporter(context))
       writer.write(
-        rdd.iterator(partition, context).asInstanceOf[Iterator[_ <: Product2[Any, Any]]])
+        rdd.iterator(partition, context).asInstanceOf[Iterator[_ <: Product2[Any, Any]]]) // TODO:wo_note:shuffle写入，默认实现org.apache.spark.shuffle.sort.SortShuffleWriter.write
       writer.stop(success = true).get
     } catch {
       case e: Exception =>

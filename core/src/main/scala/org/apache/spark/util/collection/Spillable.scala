@@ -81,7 +81,7 @@ private[spark] abstract class Spillable[C](taskMemoryManager: TaskMemoryManager)
    */
   protected def maybeSpill(collection: C, currentMemory: Long): Boolean = {
     var shouldSpill = false
-    if (elementsRead % 32 == 0 && currentMemory >= myMemoryThreshold) {
+    if (elementsRead % 32 == 0 && currentMemory >= myMemoryThreshold) {// TODO:wo_note:内存占用判断
       // Claim up to double our current memory from the shuffle memory pool
       val amountToRequest = 2 * currentMemory - myMemoryThreshold
       val granted = acquireMemory(amountToRequest)
@@ -90,15 +90,15 @@ private[spark] abstract class Spillable[C](taskMemoryManager: TaskMemoryManager)
       // or we already had more memory than myMemoryThreshold), spill the current collection
       shouldSpill = currentMemory >= myMemoryThreshold
     }
-    shouldSpill = shouldSpill || _elementsRead > numElementsForceSpillThreshold
+    shouldSpill = shouldSpill || _elementsRead > numElementsForceSpillThreshold// TODO:wo_note:元素个数判断
     // Actually spill
-    if (shouldSpill) {
+    if (shouldSpill) {// TODO:wo_note:溢写操作
       _spillCount += 1
       logSpillage(currentMemory)
-      spill(collection)
+      spill(collection) // TODO:wo_note:写磁盘，实现org.apache.spark.util.collection.ExternalSorter.spill
       _elementsRead = 0
       _memoryBytesSpilled += currentMemory
-      releaseMemory()
+      releaseMemory() // TODO:wo_note:释放内存
     }
     shouldSpill
   }

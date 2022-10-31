@@ -337,7 +337,7 @@ object SparkEnv extends Logging {
       shortShuffleMgrNames.getOrElse(shuffleMgrName.toLowerCase(Locale.ROOT), shuffleMgrName)
     val shuffleManager = instantiateClass[ShuffleManager](shuffleMgrClass)
 
-    val memoryManager: MemoryManager = UnifiedMemoryManager(conf, numUsableCores)
+    val memoryManager: MemoryManager = UnifiedMemoryManager(conf, numUsableCores) // TODO:wo_note:内存管理，统一内存管理(动态内存管理，spark3.0)
 
     val blockManagerPort = if (isDriver) {
       conf.get(DRIVER_BLOCK_MANAGER_PORT)

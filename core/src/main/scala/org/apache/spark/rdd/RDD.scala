@@ -308,7 +308,7 @@ abstract class RDD[T: ClassTag](
    */
   final def iterator(split: Partition, context: TaskContext): Iterator[T] = {
     if (storageLevel != StorageLevel.NONE) {
-      getOrCompute(split, context)
+      getOrCompute(split, context)// TODO:wo_note:
     } else {
       computeOrReadCheckpoint(split, context)
     }
@@ -346,7 +346,7 @@ abstract class RDD[T: ClassTag](
     if (isCheckpointedAndMaterialized) {
       firstParent[T].iterator(split, context)
     } else {
-      compute(split, context)
+      compute(split, context)// TODO:wo_note:org.apache.spark.rdd.ShuffledRDD.compute
     }
   }
 
@@ -359,7 +359,7 @@ abstract class RDD[T: ClassTag](
     // This method is called on executors, so we need call SparkEnv.get instead of sc.env.
     SparkEnv.get.blockManager.getOrElseUpdate(blockId, storageLevel, elementClassTag, () => {
       readCachedBlock = false
-      computeOrReadCheckpoint(partition, context)
+      computeOrReadCheckpoint(partition, context)// TODO:wo_note:
     }) match {
       case Left(blockResult) =>
         if (readCachedBlock) {

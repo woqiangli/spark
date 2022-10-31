@@ -49,7 +49,7 @@ private[spark] class SortShuffleWriter[K, V, C](
 
   /** Write a bunch of records to this task's output */
   override def write(records: Iterator[Product2[K, V]]): Unit = {
-    sorter = if (dep.mapSideCombine) {
+    sorter = if (dep.mapSideCombine) {// TODO:wo_note:是否支持预聚合
       new ExternalSorter[K, V, C](
         context, dep.aggregator, Some(dep.partitioner), dep.keyOrdering, dep.serializer)
     } else {
@@ -59,15 +59,15 @@ private[spark] class SortShuffleWriter[K, V, C](
       new ExternalSorter[K, V, V](
         context, aggregator = None, Some(dep.partitioner), ordering = None, dep.serializer)
     }
-    sorter.insertAll(records)
+    sorter.insertAll(records)// TODO:wo_note:写入所有数据
 
     // Don't bother including the time to open the merged output file in the shuffle write time,
     // because it just opens a single file, so is typically too fast to measure accurately
     // (see SPARK-3570).
     val mapOutputWriter = shuffleExecutorComponents.createMapOutputWriter(
       dep.shuffleId, mapId, dep.partitioner.numPartitions)
-    sorter.writePartitionedMapOutput(dep.shuffleId, mapId, mapOutputWriter)
-    val partitionLengths = mapOutputWriter.commitAllPartitions()
+    sorter.writePartitionedMapOutput(dep.shuffleId, mapId, mapOutputWriter)// TODO:wo_note:合并临时文件
+    val partitionLengths = mapOutputWriter.commitAllPartitions()// TODO:wo_note:
     mapStatus = MapStatus(blockManager.shuffleServerId, partitionLengths, mapId)
   }
 
@@ -98,11 +98,11 @@ private[spark] class SortShuffleWriter[K, V, C](
 private[spark] object SortShuffleWriter {
   def shouldBypassMergeSort(conf: SparkConf, dep: ShuffleDependency[_, _, _]): Boolean = {
     // We cannot bypass sorting if we need to do map-side aggregation.
-    if (dep.mapSideCombine) {
+    if (dep.mapSideCombine) { // TODO:wo_note:map端的预聚合
       false
     } else {
       val bypassMergeThreshold: Int = conf.get(config.SHUFFLE_SORT_BYPASS_MERGE_THRESHOLD)
-      dep.partitioner.numPartitions <= bypassMergeThreshold
+      dep.partitioner.numPartitions <= bypassMergeThreshold // TODO:wo_note:下游分区器数据判断()
     }
   }
 }
