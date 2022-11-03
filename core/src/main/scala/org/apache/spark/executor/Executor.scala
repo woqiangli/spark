@@ -577,7 +577,7 @@ private[spark] class Executor(
 
         executorSource.SUCCEEDED_TASKS.inc(1L)
         setTaskFinishedAndClearInterruptStatus()
-        execBackend.statusUpdate(taskId, TaskState.FINISHED, serializedResult)
+        execBackend.statusUpdate(taskId, TaskState.FINISHED, serializedResult) // TODO:wo_note:更新task状态，当stage中的task都完成，会转到child stage执行
       } catch {
         case t: TaskKilledException =>
           logInfo(s"Executor killed $taskName (TID $taskId), reason: ${t.reason}")

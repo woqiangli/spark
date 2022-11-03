@@ -351,7 +351,7 @@ private[spark] class DAGScheduler(
           // shuffleIdToMapStage by the stage creation process for an earlier dependency. See
           // SPARK-13902 for more information.
           if (!shuffleIdToMapStage.contains(dep.shuffleId)) {
-            createShuffleMapStage(dep, firstJobId)
+            createShuffleMapStage(dep, firstJobId) // TODO:wo_note:
           }
         }
         // Finally, create a stage for the given shuffle dependency.
@@ -711,7 +711,7 @@ private[spark] class DAGScheduler(
     assert(partitions.nonEmpty)
     val func2 = func.asInstanceOf[(TaskContext, Iterator[_]) => _]
     val waiter = new JobWaiter[U](this, jobId, partitions.size, resultHandler)
-    eventProcessLoop.post(JobSubmitted(// TODO:wo_note:提交submit event
+    eventProcessLoop.post(JobSubmitted(// TODO:wo_note:提交submit event，事件处理实现org.apache.spark.scheduler.DAGSchedulerEventProcessLoop.doOnReceive, 2159
       jobId, rdd, func2, partitions.toArray, callSite, waiter,
       Utils.cloneProperties(properties)))
     waiter
@@ -1119,7 +1119,7 @@ private[spark] class DAGScheduler(
     }
 
     // Figure out the indexes of partition ids to compute.
-    val partitionsToCompute: Seq[Int] = stage.findMissingPartitions()
+    val partitionsToCompute: Seq[Int] = stage.findMissingPartitions() // TODO:wo_note
 
     // Use the scheduling pool, job group, description, etc. from an ActiveJob associated
     // with this Stage
@@ -2196,7 +2196,7 @@ private[scheduler] class DAGSchedulerEventProcessLoop(dagScheduler: DAGScheduler
     case GettingResultEvent(taskInfo) =>
       dagScheduler.handleGetTaskResult(taskInfo)
 
-    case completion: CompletionEvent =>
+    case completion: CompletionEvent => // TODO:wo_note:处理executor发会来的task finished消息，当stage中的task都完成，会转到child stage执行
       dagScheduler.handleTaskCompletion(completion)
 
     case TaskSetFailed(taskSet, reason, exception) =>

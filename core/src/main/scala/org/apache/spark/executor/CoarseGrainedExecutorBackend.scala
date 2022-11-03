@@ -91,7 +91,7 @@ private[spark] class CoarseGrainedExecutorBackend(
       // This is a very fast action so we can use "ThreadUtils.sameThread"
       driver = Some(ref)
       ref.ask[Boolean](RegisterExecutor(executorId, self, hostname, cores, extractLogUrls,
-        extractAttributes, _resources, resourceProfile.id)) // TODO:wo_note:实现: org.apache.spark.scheduler.cluster.CoarseGrainedSchedulerBackend.DriverEndpoint.receiveAndReply; 图.步7. 注册Executor
+        extractAttributes, _resources, resourceProfile.id)) // TODO:wo_note:向driver放送消息，实现: org.apache.spark.scheduler.cluster.CoarseGrainedSchedulerBackend.DriverEndpoint.receiveAndReply; 图.步7. 注册Executor
     }(ThreadUtils.sameThread).onComplete {
       case Success(_) =>
         self.send(RegisteredExecutor)// TODO:wo_note:发送消息，通知executor注册完毕，处理方法: receive;图.步8. 注册成功

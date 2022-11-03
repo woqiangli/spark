@@ -489,7 +489,7 @@ private[spark] class ApplicationMaster(
 
   private def runDriver(): Unit = {
     addAmIpFilter(None, System.getenv(ApplicationConstants.APPLICATION_WEB_PROXY_BASE_ENV))
-    userClassThread = startUserApplication()// TODO:wo_note:启动Driver线程，切换到--class的执行;图.步3. AM根据参数启动Driver的线程，并初始化SparkContext
+    userClassThread = startUserApplication()// TODO:wo_note:启动Driver线程，切换到--class的执行;图.步3. AM根据参数启动Driver的线程，并初始化SparkContext，实现org.apache.spark.SparkContext, 375
 
     // This a bit hacky, but we need to wait until the spark.driver.port property has
     // been set by the Thread executing the user class.
