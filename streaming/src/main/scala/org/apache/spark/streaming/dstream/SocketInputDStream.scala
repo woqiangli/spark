@@ -40,7 +40,7 @@ class SocketInputDStream[T: ClassTag](
   ) extends ReceiverInputDStream[T](_ssc) {
 
   def getReceiver(): Receiver[T] = {
-    new SocketReceiver(host, port, bytesToObjects, storageLevel)
+    new SocketReceiver(host, port, bytesToObjects, storageLevel) // TODO:wo_note
   }
 }
 
@@ -54,7 +54,7 @@ class SocketReceiver[T: ClassTag](
 
   private var socket: Socket = _
 
-  def onStart(): Unit = {
+  def onStart(): Unit = { // TODO:wo_note:采集
 
     logInfo(s"Connecting to $host:$port")
     try {
@@ -73,7 +73,7 @@ class SocketReceiver[T: ClassTag](
     }.start()
   }
 
-  def onStop(): Unit = {
+  def onStop(): Unit = { // TODO:wo_note:停止
     // in case restart thread close it twice
     synchronized {
       if (socket != null) {

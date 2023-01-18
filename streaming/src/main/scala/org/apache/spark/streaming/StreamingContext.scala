@@ -299,7 +299,7 @@ class StreamingContext private[streaming] (
       port: Int,
       storageLevel: StorageLevel = StorageLevel.MEMORY_AND_DISK_SER_2
     ): ReceiverInputDStream[String] = withNamedScope("socket text stream") {
-    socketStream[String](hostname, port, SocketReceiver.bytesToLines, storageLevel)
+    socketStream[String](hostname, port, SocketReceiver.bytesToLines, storageLevel) // TODO:wo_note
   }
 
   /**
@@ -318,7 +318,7 @@ class StreamingContext private[streaming] (
       converter: (InputStream) => Iterator[T],
       storageLevel: StorageLevel
     ): ReceiverInputDStream[T] = {
-    new SocketInputDStream[T](this, hostname, port, converter, storageLevel)
+    new SocketInputDStream[T](this, hostname, port, converter, storageLevel) // TODO:wo_note
   }
 
   /**
