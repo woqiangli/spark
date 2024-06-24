@@ -96,19 +96,19 @@ private[spark] class SortShuffleManager(conf: SparkConf) extends ShuffleManager 
   override def registerShuffle[K, V, C](
       shuffleId: Int,
       dependency: ShuffleDependency[K, V, C]): ShuffleHandle = {
-    if (SortShuffleWriter.shouldBypassMergeSort(conf, dependency)) {// TODO:wo_note:
+    if (SortShuffleWriter.shouldBypassMergeSort(conf, dependency)) {
       // If there are fewer than spark.shuffle.sort.bypassMergeThreshold partitions and we don't
       // need map-side aggregation, then write numPartitions files directly and just concatenate
       // them at the end. This avoids doing serialization and deserialization twice to merge
       // together the spilled files, which would happen with the normal code path. The downside is
       // having multiple files open at a time and thus more memory allocated to buffers.
       new BypassMergeSortShuffleHandle[K, V](
-        shuffleId, dependency.asInstanceOf[ShuffleDependency[K, V, V]])
+        shuffleId, dependency.asInstanceOf[ShuffleDependency[K, V, V]]) // TODO:wo_note:详解，writer:BypassMergeSortShuffleWriter。使用场景：数据量少，可全内存操作。 1. sort和merge会消耗大量cpu和memory。 2. shuffle过程中简单，对于数据较少时，sort和merge的成本不能带来较多优化效果
     } else if (SortShuffleManager.canUseSerializedShuffle(dependency)) {// TODO:wo_note:
       // Otherwise, try to buffer map outputs in a serialized form, since this is more efficient:
       new SerializedShuffleHandle[K, V](
         shuffleId, dependency.asInstanceOf[ShuffleDependency[K, V, V]])
-    } else {// TODO:wo_note:默认handler，需要排序
+    } else {// TODO:wo_note:默认handler，需要排序，详解，writer:SortShuffleWriter。 使用场景大数据量的聚合运算。 1. 目的是在数据量较大时，更好的group by运算。 2. 相同key的recode会保存到同一分区的相邻的位置(BypassMergeSortShuffleWriter会写到同一分区文件，但不相邻)。 3. 排序，是指落盘时有没有按key排序保存。保存到相邻位置能跟高效率地groupby，因为不用将全部数据都放内存，只能key相同的都在一起，同一分区读完后面就不会出现。 4. 只有启用预聚合时，才会按key排序。所以groupByKey，性能很差，没有预聚合，即没有减少shuffle数据的数量，也不能加速groupBy
       // Otherwise, buffer map outputs in a deserialized form:
       new BaseShuffleHandle(shuffleId, dependency)
     }
