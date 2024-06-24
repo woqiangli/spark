@@ -388,7 +388,7 @@ private[spark] class DAGScheduler(
     checkBarrierStageWithNumSlots(rdd)
     checkBarrierStageWithRDDChainPattern(rdd, rdd.getNumPartitions)
     val numTasks = rdd.partitions.length
-    val parents = getOrCreateParentStages(rdd, jobId) // TODO:wo_note:递归创建父stage
+    val parents = getOrCreateParentStages(rdd, jobId) // TODO:wo_note:递归创建所有父stage，直到第一个stage
     val id = nextStageId.getAndIncrement()
     val stage = new ShuffleMapStage(
       id, rdd, numTasks, parents, jobId, rdd.creationSite, shuffleDep, mapOutputTracker)// TODO:wo_note:创建当前stage
